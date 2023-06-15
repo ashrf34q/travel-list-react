@@ -18,11 +18,26 @@ export default function App() {
     setItems((items) => items.filter((item) => item.id !== id));
   }
 
+  function handleToggleItem(id) {
+    // items.map will create a new array of the current items, but
+    // for the object that has the same id as the argument. It will cfreate a new object
+    // but toggle the packed attribute.
+    setItems((items) =>
+      items.map((item) =>
+        item.id === id ? { ...item, packed: !item.packed } : item
+      )
+    );
+  }
+
   return (
     <div className="app">
       <Logo />
       <Form onAddItems={handleAddItems} />
-      <PackingList items={items} onDeleteItem={handleDeleteItem} />
+      <PackingList
+        items={items}
+        onDeleteItem={handleDeleteItem}
+        onToggle={handleToggleItem}
+      />
       <Stats />
     </div>
   );
@@ -77,12 +92,17 @@ function Form({ onAddItems }) {
 }
 
 /* ****** PACKINGLIST COMPONENT ****** */
-function PackingList({ items, onDeleteItem }) {
+function PackingList({ items, onDeleteItem, onToggle }) {
   return (
     <div className="list">
       <ul>
         {items.map((item) => (
-          <Item item={item} onDeleteItem={onDeleteItem} key={item.id} />
+          <Item
+            item={item}
+            onDeleteItem={onDeleteItem}
+            onToggle={onToggle}
+            key={item.id}
+          />
         ))}
       </ul>
     </div>
@@ -90,9 +110,14 @@ function PackingList({ items, onDeleteItem }) {
 }
 
 /* ****** ITEM COMPONENT ****** */
-function Item({ item, onDeleteItem }) {
+function Item({ item, onDeleteItem, onToggle }) {
   return (
     <li>
+      <input
+        type="checkbox"
+        value={item.packed}
+        onChange={() => onToggle(item.id)}
+      ></input>
       <span style={item.packed ? { textDecoration: "line-through" } : {}}>
         {item.quantity} {item.description}
       </span>
