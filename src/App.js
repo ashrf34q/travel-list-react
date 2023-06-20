@@ -1,5 +1,9 @@
 import { useState } from "react";
+import Logo from "./Logo";
 import "./App.css";
+import { Form } from "./Form";
+import { PackingList } from "./PackingList";
+import { Stats } from "./Stats";
 
 // const initialItems = [
 //   { id: 1, description: "Passports", quantity: 2, packed: false },
@@ -29,6 +33,14 @@ export default function App() {
     );
   }
 
+  function handleClear() {
+    const confirmed = window.confirm(
+      "Are you sure you want to clear the list?"
+    );
+
+    if (confirmed) setItems([]);
+  }
+
   return (
     <div className="app">
       <Logo />
@@ -37,102 +49,9 @@ export default function App() {
         items={items}
         onDeleteItem={handleDeleteItem}
         onToggle={handleToggleItem}
+        onClear={handleClear}
       />
-      <Stats />
+      <Stats items={items} />
     </div>
-  );
-}
-
-/* ****** LOGO COMPONENT ****** */
-function Logo() {
-  return <h1>🌴 Far Away 💼</h1>;
-}
-
-/* ****** FORM COMPONENT ****** */
-function Form({ onAddItems }) {
-  const [description, setDescription] = useState("");
-  const [quantity, setQuantity] = useState(1);
-
-  function handleSubmit(e) {
-    e.preventDefault();
-
-    if (!description) return;
-
-    const newItem = { description, quantity, packed: false, id: Date.now() };
-    console.log(newItem);
-
-    onAddItems(newItem);
-
-    setDescription("");
-    setQuantity(1);
-  }
-
-  return (
-    <form className="add-form" onSubmit={handleSubmit}>
-      <h3>What do you need for your trip?</h3>
-      <select
-        value={quantity}
-        onChange={(e) => setQuantity(Number(e.target.value))}
-      >
-        {Array.from({ length: 20 }, (_, i) => i + 1).map((num) => (
-          <option value={num} key={num}>
-            {num}
-          </option>
-        ))}
-      </select>
-      <input
-        type="text"
-        placeholder="Item..."
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-      />
-      <button>Add</button>
-    </form>
-  );
-}
-
-/* ****** PACKINGLIST COMPONENT ****** */
-function PackingList({ items, onDeleteItem, onToggle }) {
-  return (
-    <div className="list">
-      <ul>
-        {items.map((item) => (
-          <Item
-            item={item}
-            onDeleteItem={onDeleteItem}
-            onToggle={onToggle}
-            key={item.id}
-          />
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-/* ****** ITEM COMPONENT ****** */
-function Item({ item, onDeleteItem, onToggle }) {
-  return (
-    <li>
-      <input
-        type="checkbox"
-        value={item.packed}
-        onChange={() => onToggle(item.id)}
-      ></input>
-      <span style={item.packed ? { textDecoration: "line-through" } : {}}>
-        {item.quantity} {item.description}
-      </span>
-      {/* Callback function inside the onClick so react will 
-      only call onDeleteItem when user clicks on x button */}
-      <button onClick={() => onDeleteItem(item.id)}>❌</button>
-    </li>
-  );
-}
-
-/* ****** STATS COMPONENT ****** */
-function Stats() {
-  return (
-    <footer className="stats">
-      <em>You have Xitems on your list, and you already packed Y</em>
-    </footer>
   );
 }
